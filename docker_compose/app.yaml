@@ -1,0 +1,12 @@
+version: '3.9'
+
+
+services:
+  fastapi:
+    container_name: fastapi
+    build: ..
+    command: uvicorn --factory api.app:create_app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ..:/code/
+    ports:
+      - 8000:8000
