@@ -1,6 +1,5 @@
 version: '3.9'
 
-
 services:
   fastapi:
     container_name: fastapi
@@ -10,3 +9,10 @@ services:
       - ..:/code/
     ports:
       - 8000:8000
+    networks:
+      - backend
+
+
+networks:
+  backend:
+    driver: bridge

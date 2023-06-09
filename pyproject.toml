@@ -11,6 +11,8 @@ packages = [{include = "fastapi_mongo_example"}]
 python = "^3.11"
 fastapi = {extras = ["uvicorn"], version = "^0.96.0"}
 uvicorn = "^0.22.0"
+ipython = "^8.14.0"
+pymongo = "^4.3.3"
 
 
 [build-system]
