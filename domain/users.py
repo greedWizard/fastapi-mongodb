@@ -10,6 +10,7 @@ class GenderEnum(str, Enum):
 
 
 class UserModel(BaseModel):
+    _id: str
     name: str
     email: str
     age: int
@@ -18,3 +19,6 @@ class UserModel(BaseModel):
     job_title: str
     gender: GenderEnum
     salary: float
+
+    class Config:
+        orm_mode = True
