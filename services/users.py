@@ -48,7 +48,12 @@ def validate_skip(skip: int) -> list[str]:
 def validate_ordering(ordering: str) -> list[str]:
     errors = []
 
-    if ordering is not None and ordering not in UserModel.__fields__:
+    if ordering is None:
+        return errors
+
+    check_ordering = ordering[1:] if ordering.startswith('-') else ordering
+
+    if check_ordering not in UserModel.__fields__:
         errors.append('Нельзя сортировать по данному полю')
     return errors
 
@@ -97,7 +102,7 @@ async def fetch_users(
     if errors:
         raise BadDataException(errors)
 
-    return await repository.fetch(
+    users = await repository.fetch(
         salary_gt,
         salary_lt,
         name,
@@ -105,3 +110,9 @@ async def fetch_users(
         skip,
         ordering,
     )
+    users_count = await repository.count(
+        salary_gt,
+        salary_lt,
+        name,
+    )
+    return users, users_count

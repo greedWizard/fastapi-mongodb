@@ -16,7 +16,18 @@ class ABCUserRepository(ABC):
         limit: int = 10,
         skip: int = 0,
         ordering: str = 'name',
-    ) -> list[UserModel]:
+    ) -> tuple[list[UserModel], int]:
+        ...
+
+    async def count(
+        self,
+        salary_gt: float | None = None,
+        salary_lt: float | None = None,
+        name: str | None = None,
+        limit: int = 10,
+        skip: int = 0,
+        ordering: str = 'name',
+    ) -> tuple[list[UserModel], int]:
         ...
 
     async def insert(

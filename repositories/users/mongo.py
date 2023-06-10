@@ -15,6 +15,28 @@ class UsersMongoRepository(ABCUserRepository):
     db_name: str
     collection_name: str
 
+    async def count(
+        self,
+        salary_gt: float | None = None,
+        salary_lt: float | None = None,
+        name: str | None = None,
+    ) -> list[UserModel]:
+        collection = self.client[self.db_name][self.collection_name]
+        find_query = self.get_find_query(salary_gt, salary_lt, name)
+
+        return collection.count_documents(find_query)
+
+    def get_find_query(self, salary_gt, salary_lt, name):
+        find_query = defaultdict(dict)
+
+        if salary_gt is not None:
+            find_query['salary']['$gt'] = salary_gt
+        if salary_lt is not None:
+            find_query['salary']['$lt'] = salary_lt
+        if name is not None:
+            find_query['name']['$regex'] = f'{name}'  # TODO: сделать невосприимчивость к регистру
+        return find_query
+
     async def fetch(
         self,
         salary_gt: float | None = None,
@@ -26,19 +48,15 @@ class UsersMongoRepository(ABCUserRepository):
     ) -> list[UserModel]:
         collection = self.client[self.db_name][self.collection_name]
 
-        find_query = defaultdict(dict)
-
-        if salary_gt is not None:
-            find_query['salary']['$gt'] = salary_gt
-        if salary_gt is not None:
-            find_query['salary']['$lt'] = salary_lt
-        if name is not None:
-            find_query['name']['$regex'] = rf'.+{name}.+'
+        find_query = self.get_find_query(salary_gt, salary_lt, name)
 
         sort_by_field = ordering[1:] if ordering.startswith('-') else ordering
-        order = DESCENDING if ordering.startswith('-1') else ASCENDING
+        order = DESCENDING if ordering.startswith('-') else ASCENDING
 
-        return collection.find(find_query, limit=limit, skip=skip).sort(sort_by_field, order)
+        return [
+            document for document in
+            collection.find(find_query, limit=limit, skip=skip).sort(sort_by_field, order)
+        ]
 
     async def insert(
         self,
